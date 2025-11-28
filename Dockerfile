@@ -1,4 +1,4 @@
-FROM php:8.4-cli
+FROM php:8.2-cli
 
 RUN apt-get update && apt-get install -y \
     git \
@@ -28,7 +28,9 @@ WORKDIR /var/www/symfony
 
 COPY . .
 
-RUN composer update
+RUN composer install --no-interaction --optimize-autoloader --prefer-dist \
+  && php bin/console cache:clear --env=prod \
+  && php bin/console cache:warmup --env=prod
 
 EXPOSE 8000
 
