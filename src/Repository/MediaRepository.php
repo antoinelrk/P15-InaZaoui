@@ -21,6 +21,16 @@ class MediaRepository extends ServiceEntityRepository
         parent::__construct($registry, Media::class);
     }
 
+    public function findByUser(int $userId): array
+    {
+        return $this->findBy(['user' => $userId]);
+    }
+
+    public function findByAlbum(int $userId): array
+    {
+        return $this->findBy(['album' => $userId]);
+    }
+
 //    /**
 //     * @return Media[] Returns an array of Media objects
 //     */
