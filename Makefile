@@ -13,6 +13,15 @@ setup:
 dump:
 	@docker exec -i postgres psql -U postgres -d ina_zaoui < dump.sql
 
+clean:
+	@echo "Cleaning project..."
+	@rm -rf var/cache/*
+	@rm -rf var/log/*
+	@rm -rf var/sessions/*
+	@docker exec -it app php bin/console cache:clear
+	@php bin/console cache:clear
+
+
 # Soon:
 test:
 	@composer db-test
