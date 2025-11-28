@@ -6,13 +6,21 @@ setup:
 	@docker exec -it postgres psql -U postgres -d postgres -c "CREATE DATABASE ina_zaoui_test;"
 
 	@docker exec -it app php bin/console doctrine:schema:update --force
-	@#docker exec -it app php bin/console doctrine:migrations:migrate --no-interaction
 
-	# Faire les backups
+	# Dumps
+	$(MAKE) dump
+
+dump:
 	@docker exec -i postgres psql -U postgres -d ina_zaoui < dump.sql
 
-backup:
-	@docker exec -it postgres pg_dump -U postgres -d ina_zaoui -F c -b -v -f /var/lib/postgresql/data/backup/ina_zaoui.backup
+clean:
+	@echo "Cleaning project..."
+	@rm -rf var/cache/*
+	@rm -rf var/log/*
+	@rm -rf var/sessions/*
+	@docker exec -it app php bin/console cache:clear
+	@php bin/console cache:clear
+
 
 # Soon:
 test:
