@@ -3,12 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\Media;
+use App\Traits\HasPagination;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Pagerfanta\Pagerfanta;
 
 /**
- * @extends ServiceEntityRepository<Media>
- *
  * @method Media|null find($id, $lockMode = null, $lockVersion = null)
  * @method Media|null findOneBy(array $criteria, array $orderBy = null)
  * @method Media[]    findAll()
@@ -16,43 +16,49 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class MediaRepository extends ServiceEntityRepository
 {
+    use HasPagination;
+
+    /**
+     * MediaRepository constructor.
+     *
+     * @param ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Media::class);
     }
 
-    public function findByUser(int $userId): array
+    /**
+     * Get paginated media
+     *
+     * @param array $filters
+     *
+     * @return Pagerfanta
+     */
+    public function get(array $filters = []): Pagerfanta
     {
-        return $this->findBy(['user' => $userId]);
+        $page = $filters['page'] ?? self::DEFAULT_PAGE;
+        $limit = $filters['limit'] ?? self::DEFAULT_LIMIT;
+        $user = $filters['user'] ?? null;
+        $album = $filters['album'] ?? null;
+
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->orderBy('p.id', 'DESC');
+
+        if ($user !== null) {
+            $queryBuilder->andWhere('p.user = :user')
+                ->setParameter('user', $user);
+        }
+
+        if ($album !== null) {
+            $queryBuilder->andWhere('p.album = :album')
+                ->setParameter('album', $album);
+        }
+
+        return $this->paginate(
+            query: $queryBuilder,
+            page: $page,
+            limit: $limit
+        );
     }
-
-    public function findByAlbum(int $userId): array
-    {
-        return $this->findBy(['album' => $userId]);
-    }
-
-//    /**
-//     * @return Media[] Returns an array of Media objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('m.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Media
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

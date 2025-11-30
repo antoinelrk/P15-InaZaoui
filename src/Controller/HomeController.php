@@ -6,15 +6,24 @@ use App\Repository\AlbumRepository;
 use App\Repository\MediaRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class HomeController extends AbstractController
 {
     /**
+     * Number of media per page
+     * @var int
+     */
+    private const int MEDIA_PER_PAGE = 6;
+
+    /**
      * HomeController constructor.
      *
      * @param UserRepository $userRepository
+     * @param AlbumRepository $albumRepository
+     * @param MediaRepository $mediaRepository
      */
     public function __construct(
         protected readonly UserRepository $userRepository,
@@ -68,25 +77,39 @@ class HomeController extends AbstractController
     /**
      * Display portfolio page
      *
-     * @param int|null $id Id of the album to display
-     *
+     * @param Request $request
+     * @param int|null $id
      * @return Response
      */
-    #[Route('/portfolio/{id}', name: 'portfolio', defaults: ['id' => null])]
-    public function portfolio(?int $id = null): Response
+    #[Route('/portfolio/{id}', name: 'portfolio', defaults: ['$id' => null])]
+    public function portfolio(Request $request, ?int $id = null): Response
     {
+        $albumId = $id;
+        // Media filter
+        $page  = $request->query->getInt('page', 1);
+
         $user = $this->userRepository->admin();
         $albums = $this->albumRepository->findAll();
         $album = null;
 
-        if ($id) {
-            $album = current(array_filter($albums, fn ($a) => $a->id === $id)) ?: null;
+        if ($albumId !== null) {
+            $album = current(array_filter($albums, fn ($a) => $a->id === $albumId)) ?: null;
         }
 
         if ($album) {
-            $medias = $this->mediaRepository->findByAlbum($album->id);
+            // Display medias from the selected album
+            $medias = $this->mediaRepository->get([
+                'page' => $page,
+                'limit' => self::MEDIA_PER_PAGE,
+                'album' => $album,
+            ]);
         } else {
-            $medias = $this->mediaRepository->findByUser($user->id);
+            // Display all medias (For admin user)
+            $medias = $this->mediaRepository->get([
+                'page' => $page,
+                'limit' => self::MEDIA_PER_PAGE,
+                'user' => $user,
+            ]);
         }
 
         return $this->render('front/portfolio.html.twig', [
