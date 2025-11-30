@@ -28,7 +28,6 @@ class MediaController extends AbstractController
             $criteria['user'] = $this->getUser();
         }
 
-
         $medias = $this->mediaRepository->findBy(
             $criteria,
             ['id' => 'ASC'],
@@ -55,6 +54,8 @@ class MediaController extends AbstractController
             if (!$this->isGranted('ROLE_ADMIN')) {
                 $media->setUser($this->getUser());
             }
+
+            // TODO: ajouter un formateur de nom de fichier et gérer le poids des images.
             $media->setPath('uploads/' . md5(uniqid()) . '.' . $media->getFile()->guessExtension());
             $media->getFile()->move('uploads/', $media->getPath());
 

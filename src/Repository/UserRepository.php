@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Traits\HasPagination;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Pagerfanta\Pagerfanta;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -19,15 +21,60 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  * @method User[]    findAll()
  * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
+final class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    use HasPagination;
+
+    public function __construct(protected readonly ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
     }
 
     /**
-     * Used to upgrade (rehash) the user's password automatically over time.
+     * Get paginated users
+     *
+     * @param array $filters
+     *
+     * @return Pagerfanta
+     */
+    public function get(array $filters = []): Pagerfanta
+    {
+        $page = $filters['page'] ?? self::DEFAULT_PAGE;
+        $limit = $filters['limit'] ?? self::DEFAULT_LIMIT;
+
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->orderBy('p.id', 'DESC');
+
+        return $this->paginate(
+            query: $queryBuilder,
+            page: $page,
+            limit: $limit
+        );
+    }
+
+    /**
+     * Delete user by id
+     *
+     * @param int $id
+     * @return void
+     */
+    public function delete(int $id): void
+    {
+        $user = $this->find($id);
+
+        if ($user !== null) {
+            $entityManager = $this->getEntityManager();
+            $entityManager->remove($user);
+            $entityManager->flush();
+        }
+    }
+
+    /**
+     * Upgrade password of the user
+     *
+     * @param PasswordAuthenticatedUserInterface $user
+     * @param string $newHashedPassword
+     * @return void
      */
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
@@ -47,29 +94,4 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         return $this->findOneBy(['admin' => true]);
     }
-
-//    /**
-//     * @return User[] Returns an array of User objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?User
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

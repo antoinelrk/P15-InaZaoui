@@ -20,7 +20,10 @@ class User
         }
     }
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'boolean')]
+    private bool $active = true;
+
+    #[ORM\Column(type: 'boolean')]
     private bool $admin = false;
 
     #[ORM\Column]
@@ -90,5 +93,15 @@ class User
     public function setAdmin(bool $admin): void
     {
         $this->admin = $admin;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): void
+    {
+        $this->active = $active;
     }
 }

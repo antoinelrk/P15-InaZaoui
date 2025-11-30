@@ -6,7 +6,6 @@ setup:
 	@docker exec -it postgres psql -U postgres -d postgres -c "CREATE DATABASE ina_zaoui_test;"
 
 	@docker exec -it app php bin/console doctrine:schema:update --force
-
 	# Dumps
 	$(MAKE) dump
 
