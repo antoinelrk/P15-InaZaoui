@@ -24,6 +24,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     #[ORM\Column]
+    private ?string $password = null;
+
+    #[ORM\Column]
     private array $roles = [];
 
     #[ORM\Column(type: 'boolean')]
@@ -127,6 +130,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getPassword(): ?string
     {
-        return null;
+        return $this->password;
+    }
+
+    public function setPassword(string $hashPassword): void
+    {
+        $this->password = $hashPassword;
     }
 }
