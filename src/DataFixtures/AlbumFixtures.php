@@ -22,7 +22,6 @@ final class AlbumFixtures extends Fixture
             'Portraits',
             'Événements',
             'Mariage',
-            'Luxe',
         ];
 
         foreach ($albumsNames as $name) {
