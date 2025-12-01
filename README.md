@@ -1,5 +1,11 @@
 # Ina Zaoui
 
+## Installation
+
+*Ajouter la nouvelle doc ici*
+
+## Legacy
+
 Pour se connecter avec le compte de Ina, il faut utiliser les identifiants suivants:
 - identifiant : `ina`
 - mot de passe : `password`

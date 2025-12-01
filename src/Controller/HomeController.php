@@ -6,32 +6,28 @@ use App\Entity\Album;
 use App\Entity\Media;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 class HomeController extends AbstractController
 {
-    /**
-     * @Route("/", name="home")
-     */
-    public function home()
+    #[Route('/', name: 'home')]
+    public function home(): Response
     {
         return $this->render('front/home.html.twig');
     }
 
-    /**
-     * @Route("/guests", name="guests")
-     */
-    public function guests()
+    #[Route('/guests', name: 'guests')]
+    public function guests(): Response
     {
         $guests = $this->getDoctrine()->getRepository(User::class)->findBy(['admin' => false]);
+
         return $this->render('front/guests.html.twig', [
             'guests' => $guests
         ]);
     }
 
-    /**
-     * @Route("/guest/{id}", name="guest")
-     */
+    #[Route('/guest/{id}', name: 'guest')]
     public function guest(int $id)
     {
         $guest = $this->getDoctrine()->getRepository(User::class)->find($id);
@@ -40,9 +36,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/portfolio/{id}", name="portfolio")
-     */
+    #[Route('/portfolio/{id}', name: 'portfolio', defaults: ['id' => null])]
     public function portfolio(?int $id = null)
     {
         $albums = $this->getDoctrine()->getRepository(Album::class)->findAll();
@@ -59,9 +53,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/about", name="about")
-     */
+    #[Route('/about', name: 'about')]
     public function about()
     {
         return $this->render('front/about.html.twig');
