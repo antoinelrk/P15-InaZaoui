@@ -2,8 +2,6 @@
 
 namespace App\Controller\Admin;
 
-
-use App\Repository\GuestRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,11 +11,18 @@ final class UserController extends AbstractController
 {
     /**
      * UserController constructor.
+     *
+     * @param UserRepository $userRepository
      */
     public function __construct(
         protected readonly UserRepository $userRepository,
     ) {}
 
+    /**
+     * List users
+     *
+     * @return Response
+     */
     #[Route('/admin/user', name: 'admin_user_index', methods: ['GET'])]
     public function index(): Response
     {

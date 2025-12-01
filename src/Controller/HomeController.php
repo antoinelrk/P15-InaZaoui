@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class HomeController extends AbstractController
+final class HomeController extends AbstractController
 {
     /**
      * Number of media per page
@@ -85,7 +85,6 @@ class HomeController extends AbstractController
     public function portfolio(Request $request, ?int $id = null): Response
     {
         $albumId = $id;
-        // Media filter
         $page  = $request->query->getInt('page', 1);
 
         $user = $this->userRepository->admin();
