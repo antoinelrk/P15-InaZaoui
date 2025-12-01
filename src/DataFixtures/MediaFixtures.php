@@ -24,7 +24,7 @@ final class MediaFixtures extends Fixture implements DependentFixtureInterface
 
         foreach ($users as $user) {
             if ($user->id === 1) {
-                return;
+                continue;
             }
 
             for ($i = 1; $i <= 20; $i++) {
