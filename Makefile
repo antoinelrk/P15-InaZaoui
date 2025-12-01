@@ -7,8 +7,13 @@ setup:
 
 	@docker exec -it app php bin/console doctrine:schema:update --force
 
-	# Dumps
-	$(MAKE) dump
+	$(MAKE) fixtures-load
+
+	#$(MAKE) dump
+
+fixtures-load:
+	@echo "Loading fixtures..."
+	@docker exec -it app php bin/console doctrine:fixtures:load --no-interaction
 
 dump:
 	@docker exec -i postgres psql -U postgres -d ina_zaoui < dump.sql

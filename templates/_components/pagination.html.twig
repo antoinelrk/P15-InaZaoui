@@ -1,0 +1,82 @@
+{% if pager.nbPages > 1 %}
+    <nav aria-label="Pagination">
+        <ul class="pagination">
+            <li class="page-item {{ pager.currentPage == 1 ? 'disabled' }}">
+                <a class="page-link" href="{{ pager.currentPage != 1 ? path(route, route_params|merge({ (page_param ?? 'page'): 1 })) : '#' }}">
+                    «
+                </a>
+            </li>
+
+            <li class="page-item {{ not pager.hasPreviousPage ? 'disabled' }}">
+                <a
+                    class="page-link"
+                    href="{{ pager.hasPreviousPage ? path(route, route_params|merge({ (page_param ?? 'page'): pager.previousPage })) : '#' }}"
+                >
+                    ‹
+                </a>
+            </li>
+
+            {# PAGES NUMBERS #}
+
+            {% if not isCompact %}
+
+                {# Normal mode #}
+                {% for p in 1..pager.nbPages %}
+                    <li class="page-item {{ p == pager.currentPage ? 'active' }}">
+                        <a class="page-link"
+                           href="{{ path(route, route_params|merge({ (page_param ?? 'page'): p })) }}">
+                            {{ p }}
+                        </a>
+                    </li>
+                {% endfor %}
+
+            {% else %}
+                {# Compact mode#}
+                {% set prev_shown = null %}
+
+                {% for p in 1..pager.nbPages %}
+                    {% set show =
+                        pager.nbPages <= page_breaker ?? 4
+                        or p <= 2
+                        or p >= pager.nbPages - 2
+                        or (p >= pager.currentPage - 1 and p <= pager.currentPage + 1)
+                    %}
+
+                    {% if show %}
+                        {% if prev_shown is not null and p > prev_shown + 1 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">…</span>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item {{ p == pager.currentPage ? 'active' }}">
+                            <a class="page-link"
+                               href="{{ path(route, route_params|merge({ (page_param ?? 'page'): p })) }}">
+                                {{ p }}
+                            </a>
+                        </li>
+
+                        {% set prev_shown = p %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <li class="page-item {{ not pager.hasNextPage ? 'disabled' }}">
+                <a class="page-link"
+                   href="{{ pager.hasNextPage ? path(route, route_params|merge({ (page_param ?? 'page'): pager.nextPage })) : '#' }}"
+                >
+                    ›
+                </a>
+            </li>
+
+            <li class="page-item {{ pager.currentPage == pager.nbPages ? 'disabled' }}">
+                <a
+                    class="page-link"
+                    href="{{ pager.currentPage != pager.nbPages ? path(route, route_params|merge({ (page_param ?? 'page'): pager.nbPages })) : '#' }}"
+                >
+                    »
+                </a>
+            </li>
+        </ul>
+    </nav>
+{% endif %}

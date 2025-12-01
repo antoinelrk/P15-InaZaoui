@@ -1,0 +1,45 @@
+{% extends 'admin.html.twig' %}
+
+{% block admin %}
+    <div class="d-flex justify-content-between align-items-center">
+        <h1>Invités</h1>
+        <a href="{{ path('admin_media_add') }}" class="btn btn-primary">Ajouter</a>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>E-Mail</th>
+                <th>Statut</th>
+                <th>Rôle</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.description|excerpt(50) }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span class="badge {{ user.active ? 'bg-success' : 'bg-danger' }}">
+                            {{ user.active ? 'Actif' : 'Bloqué' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge {{ user.admin ? 'bg-danger' : 'bg-primary' }}">
+                            {{ user.admin ? 'Administraeur': 'Invité' }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ path('admin_user_delete', {id: user.id}) }}" class="btn btn-primary">Editer</a>
+                        <a href="{{ path('admin_user_update', {id: user.id}) }}" class="btn btn-danger">Supprimer</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
