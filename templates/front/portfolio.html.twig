@@ -30,12 +30,12 @@
 
         <div class="col-12 d-flex justify-content-center mt-4">
             {% include '_components/pagination.html.twig' with {
-            pager: medias,
-            route: 'portfolio',
-            route_params: {
-                id: album ? album.id : null
-            },
-            page_param: 'page'
+                pager: medias,
+                route: 'portfolio',
+                route_params: {
+                    id: album ? album.id : null
+                },
+                isCompact: true
             } %}
         </div>
     </div>
