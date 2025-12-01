@@ -8,33 +8,55 @@ use App\Repository\MediaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class MediaController extends AbstractController
 {
+    /**
+     * Number of media per page
+     * @var int
+     */
+    private const int MEDIA_PER_PAGE = 15;
+
+    /**
+     * MediaController constructor.
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param MediaRepository $mediaRepository
+     */
     public function __construct(
         protected readonly EntityManagerInterface $entityManager,
         protected readonly MediaRepository $mediaRepository,
     ) {}
 
+    /**
+     * List medias
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
     #[Route("/admin/media", name: "admin_media_index")]
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $page = $request->query->getInt('page', 1);
 
-        $criteria = [];
+        $filters = [];
 
         if (!$this->isGranted('ROLE_ADMIN')) {
-            $criteria['user'] = $this->getUser();
+            $filters = [
+                'user' => $this->getUser(),
+            ];
         }
 
-        $medias = $this->mediaRepository->findBy(
-            $criteria,
-            ['id' => 'ASC'],
-            25,
-            25 * ($page - 1)
-        );
-        $total = $this->mediaRepository->count([]);
+        $medias = $this->mediaRepository->get([
+            ...$filters,
+            'page' => $page,
+            'limit' => self::MEDIA_PER_PAGE,
+        ]);
+
+        $total = $medias->getNbResults();
 
         return $this->render('admin/media/index.html.twig', [
             'medias' => $medias,
@@ -43,8 +65,15 @@ class MediaController extends AbstractController
         ]);
     }
 
+    /**
+     * Add a media
+     *
+     * @param Request $request
+     *
+     * @return Response
+     */
     #[Route("/admin/media/add", name: "admin_media_add")]
-    public function add(Request $request)
+    public function add(Request $request): Response
     {
         $media = new Media();
         $form = $this->createForm(MediaType::class, $media, ['is_admin' => $this->isGranted('ROLE_ADMIN')]);
@@ -68,8 +97,14 @@ class MediaController extends AbstractController
         return $this->render('admin/media/add.html.twig', ['form' => $form->createView()]);
     }
 
+    /**
+     * Delete a media
+     *
+     * @param int $id
+     * @return Response
+     */
     #[Route("/admin/media/delete/{id}", name: "admin_media_delete")]
-    public function delete(int $id)
+    public function delete(int $id): Response
     {
         $media = $this->mediaRepository->find($id);
         $this->entityManager->remove($media);
