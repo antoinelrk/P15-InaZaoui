@@ -22,7 +22,7 @@
             {% for user in users %}
                 <tr>
                     <td>{{ user.name }}</td>
-                    <td>{{ user.description|excerpt(50) }}</td>
+                    <td>{{ user.description ? user.description|excerpt(50) : '_' }}</td>
                     <td>{{ user.email }}</td>
                     <td>
                         <span class="badge {{ user.active ? 'bg-success' : 'bg-danger' }}">
