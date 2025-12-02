@@ -27,7 +27,12 @@ jobs:
 
       - name: Setup project
         run: |
-          make setup
+          docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS ina_zaoui WITH (FORCE);"
+          docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "CREATE DATABASE ina_zaoui;"
+          docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS ina_zaoui_test WITH (FORCE);"
+          docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "CREATE DATABASE ina_zaoui_test;"
+          php bin/console doctrine:schema:update --force
+          docker exec -it ina_zaoui_app php bin/console doctrine:fixtures:load --no-interaction
 
     #   - name: Build frontend assets
     #     run: |
