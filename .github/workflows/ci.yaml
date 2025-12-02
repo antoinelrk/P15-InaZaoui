@@ -44,7 +44,7 @@ jobs:
 
       - name: Start Docker stack
         run: |
-          docker compose -f compose.yaml postgres up -d --build
+          docker compose -f compose.yaml up -d --build ina_zaoui_postgres
 
       - name: Install PHP dependencies
         run: |
