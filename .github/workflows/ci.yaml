@@ -3,6 +3,7 @@ name: CI - Release Next
 on:
   push:
     branches:
+      - step-8/add-pipeline
       - release/next
 
 jobs:
