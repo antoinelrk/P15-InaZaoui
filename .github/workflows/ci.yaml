@@ -21,27 +21,38 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v4
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, xml, ctype, iconv, intl
+          tools: castor
+
+      - name: Detect Composer cache directory
+        id: composer-cache-dir
+        run: |
+          echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache-dir.outputs.dir }}
+          key: composer-${{ runner.os }}-php-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-${{ runner.os }}-php-${{ matrix.php }}-
+            composer-${{ runner.os }}-
+
       - name: Start Docker stack
         run: |
           docker compose -f compose.yaml up -d --build
 
-      - name: Setup project
+      - name: Install PHP dependencies
         run: |
-          docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS ina_zaoui WITH (FORCE);"
-          docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "CREATE DATABASE ina_zaoui;"
-          docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS ina_zaoui_test WITH (FORCE);"
-          docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "CREATE DATABASE ina_zaoui_test;"
-          php bin/console doctrine:schema:update --force
-          docker exec -it ina_zaoui_app php bin/console doctrine:fixtures:load --no-interaction
+          composer install --no-interaction --no-progress --prefer-dist
 
-    #   - name: Build frontend assets
-    #     run: |
-    #       php bin/console sass:build
-
-    #   - name: Run PHPUnit tests
-    #     run: |
-    #       php bin/phpunit
-
-    #   - name: Run static analysis
-    #     run: |
-    #       php -d memory_limit=1G vendor/bin/phpstan
+      - name: Prepare test database
+        run: |
+          php bin/console doctrine:database:drop -f --if-exists --env=test
+          php bin/console doctrine:database:create --env=test
+          php bin/console doctrine:migrations:migrate -n --env=test
+          php bin/console doctrine:fixtures:load -n --purge-with-truncate --env=test
