@@ -1,13 +1,4 @@
 services:
-  ina_zaoui_app:
-    build: .
-    container_name: ina_zaoui_app
-    ports:
-      - "8000:8000"
-    depends_on:
-      - ina_zaoui_postgres
-    volumes:
-      - ./:/var/www/symfony
   ina_zaoui_postgres:
     image: postgres:16-alpine
     container_name: ina_zaoui_postgres

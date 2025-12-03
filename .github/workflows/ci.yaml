@@ -1,0 +1,108 @@
+name: CI - Release Next
+
+on:
+  push:
+    branches:
+      - release/next
+
+jobs:
+  test-suite:
+    name: Test suite (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ubuntu]
+        php: ['8.4']
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, xml, ctype, iconv, intl
+          tools: castor
+
+      - name: Detect Composer cache directory
+        id: composer-cache-dir
+        run: |
+          echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache-dir.outputs.dir }}
+          key: composer-${{ runner.os }}-php-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-${{ runner.os }}-php-${{ matrix.php }}-
+            composer-${{ runner.os }}-
+
+      - name: Start Docker stack
+        run: |
+          docker compose -f compose.yaml up -d --build
+
+      - name: Install PHP dependencies
+        run: |
+          composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Prepare test database
+        run: |
+          php bin/console doctrine:database:drop --force --if-exists --env=test
+          php bin/console doctrine:database:create --env=test
+          php bin/console doctrine:schema:update --force --env=test
+          php bin/console doctrine:fixtures:load --env=test --no-interaction
+      # Add Tests, Reports
+
+      - name: Run test suite with coverage (Clover)
+        run: |
+          mkdir -p var/coverage
+          vendor/bin/phpunit --coverage-clover var/coverage/clover.xml
+
+      - name: Extract coverage percentage
+        run: |
+          PERCENT=$(php -r '
+              $file = "var/coverage/clover.xml";
+              if (!file_exists($file)) {
+                  fwrite(STDERR, "Coverage file not found: $file\n");
+                  exit(1);
+              }
+              $xml = simplexml_load_file($file);
+              if ($xml === false) {
+                  fwrite(STDERR, "Failed to parse clover.xml\n");
+                  exit(1);
+              }
+              $rate = (float)$xml->project->metrics["line-rate"];
+              printf("%.2f", $rate * 100);
+          ')
+          echo "COVERAGE_PERCENT=$PERCENT" >> $GITHUB_ENV
+
+      - name: Notify Discord
+        if: always()
+        run: |
+          STATUS="Success"
+          COLOR=3066993
+
+          if [ "${{ job.status }}" != "success" ]; then
+            STATUS="Failed"
+            COLOR=15158332
+          fi
+
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{
+                     \"embeds\": [{
+                       \"title\": \"CI Pipeline — $STATUS\",
+                       \"color\": $COLOR,
+                       \"fields\": [
+                         { \"name\": \"Branch\",    \"value\": \"${{ github.ref_name }}\", \"inline\": true },
+                         { \"name\": \"Author\",    \"value\": \"${{ github.actor }}\", \"inline\": true },
+                         { \"name\": \"Coverage\",  \"value\": \"${COVERAGE_PERCENT}%\", \"inline\": true }
+                       ],
+                       \"url\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+                     }]
+                   }" \
+                ${{ secrets.DISCORD_WEBHOOK_URL }}
