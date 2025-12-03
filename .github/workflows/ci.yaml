@@ -57,6 +57,12 @@ jobs:
           php bin/console doctrine:schema:update --force --env=test
           php bin/console doctrine:fixtures:load --env=test --no-interaction
       # Add Tests, Reports
+
+      - name: Run test suite with coverage (Clover)
+        run: |
+          mkdir -p var/coverage
+          vendor/bin/phpunit --coverage-clover var/coverage/clover.xml
+
       - name: Extract coverage percentage
         run: |
           PERCENT=$(php -r '
