@@ -83,4 +83,4 @@ jobs:
                        \"url\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
                      }]
                    }" \
-                ${{ secrets.DISCORD_WEBHOOK_URL }}
+                ${{ secrets.DISCORD_WEBHOOK_URL.DISCORD_WEBHOOK_URL }}
