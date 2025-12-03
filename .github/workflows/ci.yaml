@@ -83,4 +83,4 @@ jobs:
                        \"url\": \"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
                      }]
                    }" \
-                https://discord.com/api/webhooks/1445687372384698453/G7Rm20e6pydok1noC3ZdGpQTFNeUYPy68hHHlJTAmxzsWOhW9EfVd143dhZ8Jcx4_Oq-
+                ${{ secrets.DISCORD_WEBHOOK_URL }}
