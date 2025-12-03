@@ -27,6 +27,7 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: mbstring, xml, ctype, iconv, intl
           tools: castor
+          coverage: pcov  # Active PCOV dans le runner CI
 
       - name: Detect Composer cache directory
         id: composer-cache-dir
@@ -56,3 +57,15 @@ jobs:
           php bin/console doctrine:database:create --env=test
           php bin/console doctrine:schema:update --force --env=test
           php bin/console doctrine:fixtures:load --env=test --no-interaction
+
+      - name: Run test suite with coverage (Clover)
+        run: |
+          mkdir -p var/coverage
+          vendor/bin/phpunit --coverage-clover var/coverage/clover.xml
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-clover
+          path: var/coverage/clover.xml
