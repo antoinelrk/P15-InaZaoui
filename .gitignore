@@ -20,3 +20,5 @@
 ###< symfony/phpunit-bridge ###
 
 backups/
+.phpunit.cache
+coverage
