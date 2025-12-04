@@ -1,21 +1,20 @@
+serve:
+	@php -S localhost:8000 -t public
+
 setup:
 	@echo "Clear databases..."
 	@docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS ina_zaoui WITH (FORCE);"
 	@docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "CREATE DATABASE ina_zaoui;"
 	@docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS ina_zaoui_test WITH (FORCE);"
 	@docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "CREATE DATABASE ina_zaoui_test;"
-	@docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS ina_zaoui WITH (FORCE);"
-	@docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "CREATE DATABASE ina_zaoui;"
-	@docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS ina_zaoui_test WITH (FORCE);"
-	@docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "CREATE DATABASE ina_zaoui_test;"
 
-	@docker exec -it ina_zaoui_app php bin/console doctrine:schema:update --force
-	@docker exec -it ina_zaoui_app php bin/console doctrine:schema:update --force
+	@php bin/console doctrine:schema:update --force
 
 	$(MAKE) fixtures-load
+
 fixtures-load:
 	@echo "Loading fixtures..."
-	@docker exec -it ina_zaoui_app php bin/console doctrine:fixtures:load --no-interaction
+	@php bin/console doctrine:fixtures:load --no-interaction
 
 dump:
 	@docker exec -i ina_zaoui_postgres psql -U postgres -d ina_zaoui < dump.sql
