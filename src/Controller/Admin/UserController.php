@@ -40,9 +40,10 @@ final class UserController extends AbstractController
     #[Route('/admin/user/{id}/edit', name: 'admin_user_update', methods: ['GET', 'POST'])]
     public function update(int $id): Response
     {
-        return $this->render('admin/user/update.html.twig', [
-            'users' => $this->userRepository->findOneBy(["id" => $id]),
-        ]);
+        return $this->render(
+            'admin/user/update.html.twig',
+            ['users' => $this->userRepository->findOneBy(["id" => $id])]
+        );
     }
 
     /**
