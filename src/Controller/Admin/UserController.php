@@ -2,8 +2,10 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -52,11 +54,17 @@ final class UserController extends AbstractController
      * @param int $id
      * @return Response
      */
-    #[Route('/admin/user/{id}', name: 'admin_user_delete', methods: ['DELETE'])]
-    public function delete(int $id): Response
+    #[Route('/admin/user/{user}', name: 'admin_user_delete', methods: ['DELETE'])]
+    public function delete(User $user): Response
     {
-        $this->userRepository->delete($id);
+        $this->userRepository->delete($user->id);
 
         return $this->redirectToRoute('admin_user_index');
+    }
+
+    #[Route('/admin/user/add', name: 'admin_user_add', methods: ['GET', 'POST'])]
+    public function add(Request $request): Response
+    {
+        return $this->render('admin/user/add.html.twig');
     }
 }
