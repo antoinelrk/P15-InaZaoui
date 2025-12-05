@@ -121,7 +121,7 @@ class MediaController extends BaseController
         $media = $this->mediaRepository->find($id);
         $this->entityManager->remove($media);
         $this->entityManager->flush();
-        unlink($media->getPath());
+        // Media file deletion is handled by a Doctrine lifecycle callback
 
         return $this->redirectToRoute('admin_media_index');
     }
