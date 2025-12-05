@@ -35,8 +35,6 @@
                         </span>
                     </td>
                     <td class="d-flex gap-2">
-                        <a href="{{ path('admin_user_update', {user: user.id}) }}" class="btn btn-primary">Editer</a>
-
                         <form action="{{ path('admin_user_toggleAccess', {user: user.id})  }}" method="post">
                             <input type="hidden" name="_method" value="PATCH">
 
