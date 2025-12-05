@@ -48,7 +48,8 @@ final class UserFixtures extends Fixture implements DependentFixtureInterface
         for ($i = 1; $i <= 50; $i++) {
             $media = new Media;
 
-            $media->setPath('uploads/' . $i . '.webp');
+//            $media->setPath('uploads/' . $i . '.webp');
+            $media->setPath('https://placehold.co/400x600');
             $media->setUser($user);
             $media->setAlbum($albums[$i % count($albums)]);
             $media->setTitle("Photo $i");

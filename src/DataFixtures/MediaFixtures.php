@@ -32,7 +32,8 @@ final class MediaFixtures extends Fixture implements DependentFixtureInterface
 
                 $media = new Media;
 
-                $media->setPath('uploads/' . $randomIndex . '.webp');
+//                $media->setPath('uploads/' . $randomIndex . '.webp');
+                $media->setPath('https://placehold.co/400x600');
                 $media->setUser($user);
                 $media->setTitle("Photo $randomIndex de l'utilisateur {$user->getName()}");
 

@@ -58,15 +58,11 @@ final class UserRepository extends ServiceEntityRepository implements PasswordUp
      * @param int $id
      * @return void
      */
-    public function delete(int $id): void
+    public function delete(User $user): void
     {
-        $user = $this->find($id);
-
-        if ($user !== null) {
-            $entityManager = $this->getEntityManager();
-            $entityManager->remove($user);
-            $entityManager->flush();
-        }
+        $entityManager = $this->getEntityManager();
+        $entityManager->remove($user);
+        $entityManager->flush();
     }
 
     /**
