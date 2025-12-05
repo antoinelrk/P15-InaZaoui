@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\BaseController;
 use App\Entity\Media;
 use App\Form\MediaType;
 use App\Repository\MediaRepository;
@@ -9,20 +10,12 @@ use App\Service\MediaService;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Random\RandomException;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-final class MediaController extends AbstractController
+class MediaController extends BaseController
 {
-    /**
-     * Number of media per page
-     * @var int
-     */
-    private const int MEDIA_PER_PAGE = 15;
-
     /**
      * MediaController constructor.
      *
@@ -128,7 +121,7 @@ final class MediaController extends AbstractController
         $media = $this->mediaRepository->find($id);
         $this->entityManager->remove($media);
         $this->entityManager->flush();
-        unlink($media->getPath());
+        // Media file deletion is handled by a Doctrine lifecycle callback
 
         return $this->redirectToRoute('admin_media_index');
     }

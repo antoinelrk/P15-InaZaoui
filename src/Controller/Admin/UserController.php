@@ -2,17 +2,17 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\BaseController;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class UserController extends AbstractController
+class UserController extends BaseController
 {
     /**
      * UserController constructor.
@@ -30,13 +30,24 @@ final class UserController extends AbstractController
     /**
      * List users
      *
+     * @param Request $request
      * @return Response
      */
     #[Route('/admin/user', name: 'admin_user_index', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $page = $request->query->getInt('page', 1);
+
+        $users = $this->userRepository->get([
+            'page' => $page,
+            'limit' => self::MEDIA_PER_PAGE,
+        ]);
+        $total = $users->getNbResults();
+
         return $this->render('admin/user/index.html.twig', [
-            'users' => $this->userRepository->get(),
+            'users' => $users,
+            'total' => $total,
+            'page' => $page
         ]);
     }
 
@@ -82,13 +93,28 @@ final class UserController extends AbstractController
      *
      * @return Response
      */
-    #[Route('/admin/user/{user}/edit', name: 'admin_user_update', methods: ['POST'])]
+    #[Route('/admin/user/{user}/edit', name: 'admin_user_update', methods: ['GET', 'POST'])]
     public function update(User $user): Response
     {
         return $this->render(
-            'admin/user/update.html.twig',
+            'admin/user/edit.html.twig',
             ['users' => $user]
         );
+    }
+
+    /**
+     * Toggle user access
+     *
+     * @param User $user
+     * @return Response
+     */
+    #[Route('/admin/user/toggle-access/{user}', name: 'admin_user_toggleAccess', methods: ['POST'])]
+    public function toggleAccess(User $user): Response
+    {
+        $user->setActive(!$user->isActive());
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('admin_user_index');
     }
 
     /**

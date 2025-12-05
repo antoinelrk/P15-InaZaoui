@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Album;
 use App\Entity\Media;
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -24,6 +25,12 @@ class MediaType extends AbstractType
                     'required' => false,
                     'class' => User::class,
                     'choice_label' => 'name',
+                    'query_builder' => function (UserRepository $userRepository) {
+                        return $userRepository->createQueryBuilder('u')
+                            ->where('u.active = :active')
+                            ->setParameter('active', true)
+                            ->orderBy('u.name', 'ASC');
+                    },
                 ])
                 ->add('album', EntityType::class, [
                     'label' => 'Album',

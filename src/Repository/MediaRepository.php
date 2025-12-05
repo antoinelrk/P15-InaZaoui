@@ -41,6 +41,7 @@ class MediaRepository extends ServiceEntityRepository
         $limit = $filters['limit'] ?? self::DEFAULT_LIMIT;
         $user = $filters['user'] ?? null;
         $album = $filters['album'] ?? null;
+        $activeUser = $filters['active_user'] ?? null;
 
         $queryBuilder = $this->createQueryBuilder('p')
             ->orderBy('p.id', 'DESC');
@@ -53,6 +54,13 @@ class MediaRepository extends ServiceEntityRepository
         if ($album !== null) {
             $queryBuilder->andWhere('p.album = :album')
                 ->setParameter('album', $album);
+        }
+
+        if ($activeUser === true) {
+            $queryBuilder
+                ->innerJoin('p.user', 'u')
+                ->andWhere('u.active = :active')
+                ->setParameter('active', true);
         }
 
         return $this->paginate(
