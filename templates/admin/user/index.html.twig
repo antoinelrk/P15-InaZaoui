@@ -59,4 +59,13 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <div class="col-12 d-flex justify-content-center mt-4">
+        {% include '_components/pagination.html.twig' with {
+            pager: users,
+            route: 'admin_user_index',
+            route_params: {},
+            isCompact: true
+        } %}
+    </div>
 {% endblock %}
