@@ -36,7 +36,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private bool $admin = false;
 
     #[ORM\Column]
-    private ?string $name;
+    public ?string $name;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description;
