@@ -20,7 +20,7 @@
 
         <tbody>
             {% for user in users %}
-                <tr>
+                <tr class="align-middle">
                     <td>{{ user.name }}</td>
                     <td>{{ user.description ? user.description|excerpt(50) : '_' }}</td>
                     <td>{{ user.email }}</td>
@@ -34,9 +34,16 @@
                             {{ user.admin ? 'Administraeur': 'Invité' }}
                         </span>
                     </td>
-                    <td>
-                        <a href="{{ path('admin_user_delete', {user: user}) }}" class="btn btn-primary">Editer</a>
-                        <a href="{{ path('admin_user_update', {id: user.id}) }}" class="btn btn-danger">Supprimer</a>
+                    <td class="d-flex gap-2">
+                        <a href="{{ path('admin_user_update', {user: user.id}) }}" class="btn btn-primary">Editer</a>
+
+                        <form action="{{ path('admin_user_delete', {user: user.id}) }}">
+                            <input type="hidden" name="_method" value="DELETE">
+
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_user' ~ user.id) }}">
+
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                        </form>
                     </td>
                 </tr>
             {% endfor %}
