@@ -3,7 +3,7 @@
 {% block admin %}
     <div class="d-flex justify-content-between align-items-center">
         <h1>Invités</h1>
-        <a href="{{ path('admin_media_add') }}" class="btn btn-primary">Ajouter</a>
+        <a href="{{ path('admin_user_add') }}" class="btn btn-primary">Ajouter</a>
     </div>
 
     <table class="table">
@@ -20,9 +20,9 @@
 
         <tbody>
             {% for user in users %}
-                <tr>
+                <tr class="align-middle">
                     <td>{{ user.name }}</td>
-                    <td>{{ user.description|excerpt(50) }}</td>
+                    <td>{{ user.description ? user.description|excerpt(50) : '_' }}</td>
                     <td>{{ user.email }}</td>
                     <td>
                         <span class="badge {{ user.active ? 'bg-success' : 'bg-danger' }}">
@@ -34,9 +34,16 @@
                             {{ user.admin ? 'Administraeur': 'Invité' }}
                         </span>
                     </td>
-                    <td>
-                        <a href="{{ path('admin_user_delete', {id: user.id}) }}" class="btn btn-primary">Editer</a>
-                        <a href="{{ path('admin_user_update', {id: user.id}) }}" class="btn btn-danger">Supprimer</a>
+                    <td class="d-flex gap-2">
+                        <a href="{{ path('admin_user_update', {user: user.id}) }}" class="btn btn-primary">Editer</a>
+
+                        <form action="{{ path('admin_user_delete', {user: user.id}) }}">
+                            <input type="hidden" name="_method" value="DELETE">
+
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_user' ~ user.id) }}">
+
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                        </form>
                     </td>
                 </tr>
             {% endfor %}

@@ -19,7 +19,7 @@
         </thead>
         <tbody>
             {% for media in medias %}
-                <tr>
+                <tr class="align-middle">
                     <td><img src="{{ asset(media.path) }}" width="75" /></td>
                     <td>{{ media.title }}</td>
                     {% if is_granted('ROLE_ADMIN') %}

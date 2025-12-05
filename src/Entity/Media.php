@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Media
 {
     #[ORM\Id]
@@ -81,5 +82,25 @@ class Media
     public function setAlbum(?Album $album): void
     {
         $this->album = $album;
+    }
+
+    /**
+     * Remove the associated file from the filesystem when the entity is deleted
+     *
+     * @return void
+     */
+    #[ORM\PreRemove]
+    public function removeFileOnDelete(): void
+    {
+        if (!$this->path) {
+            return;
+        }
+
+        $projectDir = \dirname(__DIR__, 2);
+        $fullPath   = $projectDir . '/public/' . ltrim($this->path, '/');
+
+        if (is_file($fullPath)) {
+            @unlink($fullPath);
+        }
     }
 }

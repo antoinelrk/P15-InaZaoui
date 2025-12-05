@@ -5,11 +5,15 @@ namespace App\Controller\Admin;
 use App\Entity\Media;
 use App\Form\MediaType;
 use App\Repository\MediaRepository;
+use App\Service\MediaService;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
+use Random\RandomException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class MediaController extends AbstractController
 {
@@ -69,11 +73,15 @@ final class MediaController extends AbstractController
      * Add a media
      *
      * @param Request $request
+     * @param MediaService $mediaService
      *
      * @return Response
+     *
+     * @throws Exception
+     * @throws RandomException
      */
     #[Route("/admin/media/add", name: "admin_media_add")]
-    public function add(Request $request): Response
+    public function add(Request $request, MediaService $mediaService): Response
     {
         $media = new Media();
         $form = $this->createForm(MediaType::class, $media, ['is_admin' => $this->isGranted('ROLE_ADMIN')]);
@@ -84,9 +92,20 @@ final class MediaController extends AbstractController
                 $media->setUser($this->getUser());
             }
 
-            // TODO: ajouter un formateur de nom de fichier et gérer le poids des images.
-            $media->setPath('uploads/' . md5(uniqid()) . '.' . $media->getFile()->guessExtension());
-            $media->getFile()->move('uploads/', $media->getPath());
+            // Check if a file is selected
+            if (!$media->getFile()) {
+                $this->addFlash('error', 'Veuillez sélectionner un fichier à uploader.');
+
+                return $this->render('admin/media/add.html.twig', ['form' => $form->createView()]);
+            }
+
+            if (!$mediaService->put(media: $media, path: 'uploads/')) {
+                $this->addFlash('error', 'Une erreur est survenue lors de l\'upload du fichier.');
+
+                return $this->render('admin/media/add.html.twig', ['form' => $form->createView()]);
+            }
+
+            // TODO: FLASH SUCCESS
 
             $this->entityManager->persist($media);
             $this->entityManager->flush();
