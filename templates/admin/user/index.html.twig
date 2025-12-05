@@ -37,6 +37,16 @@
                     <td class="d-flex gap-2">
                         <a href="{{ path('admin_user_update', {user: user.id}) }}" class="btn btn-primary">Editer</a>
 
+                        <form action="{{ path('admin_user_toggleAccess', {user: user.id})  }}" method="post">
+                            <input type="hidden" name="_method" value="PATCH">
+
+                            <input type="hidden" name="_token" value="{{ csrf_token('toggle_access' ~ user.id) }}">
+
+                            <button type="submit" class="btn btn-warning">
+                                {{ user.active ? 'Bloquer' : 'Débloquer' }}
+                            </button>
+                        </form>
+
                         <form action="{{ path('admin_user_delete', {user: user.id}) }}">
                             <input type="hidden" name="_method" value="DELETE">
 

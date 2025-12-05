@@ -82,13 +82,28 @@ final class UserController extends AbstractController
      *
      * @return Response
      */
-    #[Route('/admin/user/{user}/edit', name: 'admin_user_update', methods: ['POST'])]
+    #[Route('/admin/user/{user}/edit', name: 'admin_user_update', methods: ['GET', 'POST'])]
     public function update(User $user): Response
     {
         return $this->render(
-            'admin/user/update.html.twig',
+            'admin/user/edit.html.twig',
             ['users' => $user]
         );
+    }
+
+    /**
+     * Toggle user access
+     *
+     * @param User $user
+     * @return Response
+     */
+    #[Route('/admin/user/toggle-access/{user}', name: 'admin_user_toggleAccess', methods: ['POST'])]
+    public function toggleAccess(User $user): Response
+    {
+        $user->setActive(!$user->isActive());
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('admin_user_index');
     }
 
     /**
