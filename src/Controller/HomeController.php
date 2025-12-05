@@ -101,6 +101,7 @@ final class HomeController extends AbstractController
                 'page' => $page,
                 'limit' => self::MEDIA_PER_PAGE,
                 'album' => $album,
+                'active_user' => true
             ]);
         } else {
             // Display all medias (For admin user)
@@ -108,6 +109,7 @@ final class HomeController extends AbstractController
                 'page' => $page,
                 'limit' => self::MEDIA_PER_PAGE,
                 'user' => $user,
+                'active_user' => true
             ]);
         }
 
