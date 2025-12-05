@@ -15,6 +15,7 @@ setup:
 
 	@php bin/console doctrine:schema:update --force --env=test
 	@php bin/console doctrine:fixtures:load --no-interaction --env=test
+
 dump:
 	@docker exec -i ina_zaoui_postgres psql -U postgres -d ina_zaoui < dump.sql
 
