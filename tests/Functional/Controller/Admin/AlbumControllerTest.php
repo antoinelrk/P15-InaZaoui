@@ -4,13 +4,14 @@ namespace App\Tests\Functional\Controller\Admin;
 
 use App\Entity\Album;
 use App\Entity\User;
+use App\Tests\TestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use App\Repository\AlbumRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 
-class AlbumControllerTest extends WebTestCase
+class AlbumControllerTest extends TestCase
 {
     /** Simulated HTTP client */
     private KernelBrowser $client;

@@ -1516,6 +1516,14 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         not_valid_current_page?: "to_http_not_found"|"custom", // Default: "to_http_not_found"
  *     },
  * }
+ * @psalm-type LiipTestFixturesConfig = array{
+ *     cache_db?: array{
+ *         sqlite?: scalar|null, // Default: null
+ *         ...<mixed>
+ *     },
+ *     keep_database_and_schema?: bool, // Default: false
+ *     cache_metadata?: bool, // Default: true
+ * }
  * @psalm-type DebugConfig = array{
  *     max_items?: int, // Max number of displayed items past the first level, -1 means no limit. // Default: 2500
  *     min_depth?: int, // Minimum tree depth to clone all the items, 1 is default. // Default: 1
@@ -1555,6 +1563,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         monolog?: MonologConfig,
  *         maker?: MakerConfig,
  *         babdev_pagerfanta?: BabdevPagerfantaConfig,
+ *         liip_test_fixtures?: LiipTestFixturesConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -1582,6 +1591,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
  *         babdev_pagerfanta?: BabdevPagerfantaConfig,
+ *         liip_test_fixtures?: LiipTestFixturesConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,
