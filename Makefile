@@ -11,12 +11,10 @@ setup:
 	@docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "CREATE DATABASE ina_zaoui_test;"
 
 	@php bin/console doctrine:schema:update --force
-
-	$(MAKE) fixtures-load
-
-fixtures-load:
-	@echo "Loading fixtures..."
 	@php bin/console doctrine:fixtures:load --no-interaction
+
+	@php bin/console doctrine:schema:update --force --env=test
+	@php bin/console doctrine:fixtures:load --no-interaction --env=test
 
 dump:
 	@docker exec -i ina_zaoui_postgres psql -U postgres -d ina_zaoui < dump.sql
@@ -29,6 +27,12 @@ clean:
 	@php bin/console cache:clear
 
 test:
+	@docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "DROP DATABASE IF EXISTS ina_zaoui_test WITH (FORCE);"
+	@docker exec -it ina_zaoui_postgres psql -U postgres -d postgres -c "CREATE DATABASE ina_zaoui_test;"
+
+	@php bin/console doctrine:schema:update --force --env=test
+	@php bin/console doctrine:fixtures:load --no-interaction --env=test
+
 	@vendor/bin/phpunit --coverage-html=coverage
 
 stan:
