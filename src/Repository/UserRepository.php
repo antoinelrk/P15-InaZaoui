@@ -14,8 +14,6 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 /**
  * @extends ServiceEntityRepository<User>
  *
- * @implements PasswordUpgraderInterface<User>
- *
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
  * @method User|null findOneBy(array $criteria, array $orderBy = null)
  * @method User[]    findAll()
@@ -55,7 +53,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     /**
      * Delete user by id
      *
-     * @param int $id
+     * @param User $user
      * @return void
      */
     public function delete(User $user): void

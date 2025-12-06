@@ -37,4 +37,4 @@ test:
 
 stan:
 	@php vendor/bin/phpstan clear-result-cache
-	@php -d memory_limit=1G vendor/bin/phpstan analyse
+	@php -d memory_limit=4G vendor/bin/phpstan analyse

@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Controller\BaseController;
 use App\Entity\Media;
+use App\Entity\User;
 use App\Form\MediaType;
 use App\Repository\MediaRepository;
 use App\Service\MediaService;
@@ -82,7 +83,7 @@ final class MediaController extends BaseController
 
         if ($form->isSubmitted() && $form->isValid()) {
             if (!$this->isGranted('ROLE_ADMIN')) {
-                $media->setUser($this->getUser());
+                $media->setUser($this->getUser() instanceof User ? $this->getUser() : null);
             }
 
             // Check if a file is selected
@@ -97,8 +98,6 @@ final class MediaController extends BaseController
 
                 return $this->render('admin/media/add.html.twig', ['form' => $form->createView()]);
             }
-
-            // TODO: FLASH SUCCESS
 
             $this->entityManager->persist($media);
             $this->entityManager->flush();

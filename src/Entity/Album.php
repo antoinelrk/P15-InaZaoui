@@ -27,6 +27,8 @@ class Album
         cascade: ['remove'],
         orphanRemoval: true
     )]
+
+    /** @phpstan-ignore property.unused */
     private Collection $media;
 
     public function getName(): string
@@ -38,4 +40,5 @@ class Album
     {
         $this->name = $name;
     }
+
 }
