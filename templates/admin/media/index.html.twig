@@ -24,11 +24,15 @@
                     <td>{{ media.title }}</td>
                     {% if is_granted('ROLE_ADMIN') %}
                         <td>
+                        {% if media.user %}
                             {{ media.user.name }}
 
                             {% if not media.user.active %}
                                 <span class="badge bg-danger">Bloqué</span>
                             {% endif %}
+                        {% else %}
+                            Utilisateur supprimé
+                        {% endif %}
                         </td>
                         <td>{{ media.album.name ?? '' }}</td>
                     {% endif %}

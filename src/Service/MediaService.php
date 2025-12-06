@@ -8,7 +8,7 @@ use Random\RandomException;
 use Spatie\Image\Image;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-final readonly class MediaService
+class MediaService
 {
     /**
      * MediaService constructor.
